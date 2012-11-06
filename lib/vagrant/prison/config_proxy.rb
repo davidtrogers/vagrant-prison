@@ -1,4 +1,4 @@
-class Vagrant::Sandbox
+class Vagrant::Prison
   # this is a sort-of proc-to-ast with certain constraints only available to
   # "dsls" which configure things
   #

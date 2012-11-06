@@ -1,11 +1,11 @@
 require 'vagrant'
-require 'vagrant/sandbox/version'
-require 'vagrant/sandbox/config_proxy'
+require 'vagrant/prison/version'
+require 'vagrant/prison/config_proxy'
 require 'fileutils'
 require 'tempfile'
 require 'erb'
 
-Vagrant::Sandbox::Vagrantfile = <<-EOF
+Vagrant::Prison::Vagrantfile = <<-EOF
 dumped_config = <%= @config.inspect %>
 
 Vagrant::Config.run do |config|
@@ -13,7 +13,7 @@ Vagrant::Config.run do |config|
 end
 EOF
 
-class Vagrant::Sandbox
+class Vagrant::Prison
   attr_reader :dir
 
   #
@@ -35,7 +35,7 @@ class Vagrant::Sandbox
   end
 
   def self.cleanup(dir, env)
-    Vagrant::Sandbox.new(dir, false, env).cleanup
+    Vagrant::Prison.new(dir, false, env).cleanup
   end
 
   #
@@ -100,7 +100,7 @@ class Vagrant::Sandbox
 
     to_write = if @initial_config.kind_of?(ConfigProxy)
                  @config = Marshal.dump(@initial_config)
-                 ERB.new(Vagrant::Sandbox::Vagrantfile).result(binding)
+                 ERB.new(Vagrant::Prison::Vagrantfile).result(binding)
                else
                  @initial_config
                end
@@ -112,7 +112,7 @@ class Vagrant::Sandbox
     if @cleanup_on_exit
       # clean up after garbage collection or if the system exits
       ObjectSpace.define_finalizer(self) do
-        Vagrant::Sandbox.cleanup(dir, env)
+        Vagrant::Prison.cleanup(dir, env)
       end
 
       obj = self # look ma, closures

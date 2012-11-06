@@ -1,11 +1,11 @@
 # -*- encoding: utf-8 -*-
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'vagrant/sandbox/version'
+require 'vagrant/prison/version'
 
 Gem::Specification.new do |gem|
-  gem.name          = "vagrant-sandbox"
-  gem.version       = Vagrant::Sandbox::VERSION
+  gem.name          = "vagrant-prison"
+  gem.version       = Vagrant::Prison::VERSION
   gem.authors       = ["Erik Hollensbe"]
   gem.email         = ["erik+github@hollensbe.org"]
   gem.description   = %q{A programmatic way to configure and sandbox Vagrant}

@@ -1,5 +1,5 @@
 module Vagrant
-  class Sandbox
+  class Prison
     VERSION = "0.0.1"
   end
 end
