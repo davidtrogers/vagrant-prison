@@ -8,8 +8,8 @@ Gem::Specification.new do |gem|
   gem.version       = Vagrant::Sandbox::VERSION
   gem.authors       = ["Erik Hollensbe"]
   gem.email         = ["erik+github@hollensbe.org"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.description   = %q{A programmatic way to configure and sandbox Vagrant}
+  gem.summary       = %q{A programmatic way to configure and sandbox Vagrant}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($/)
@@ -18,6 +18,4 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
 
   gem.add_dependency 'vagrant', '~> 1.0.5'
-  gem.add_dependency 'ruby_parser', '~> 3.0.1'
-  gem.add_dependency 'ruby2ruby', '~> 2.0.1'
 end
