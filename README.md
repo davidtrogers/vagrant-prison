@@ -1,6 +1,6 @@
 # Vagrant::Sandbox
 
-TODO: Write a gem description
+Drive vagrant configuration directly from your test suite, rakefiles, etc.
 
 ## Installation
 
@@ -18,7 +18,35 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+See the documentation for Vagrant::Sandbox for extended usage, but here's an
+example!
+
+```ruby
+# construct a vagrant environment from the configuration and start all the
+# boxes within it. Upon exiting (via ^C), destroy the boxes and the directory.
+
+require 'vagrant'
+sandbox = Vagrant::Sandbox.new
+
+sandbox.configure do |config|
+  config.vm.box = "ubuntu"
+
+  config.vm.define :test, :primary => true do |test_config|
+    test_config.vm.network :hostonly, "192.168.33.10"
+  end
+end
+
+# if you don't set :ui_class here, it still works, it just provides no output.
+Vagrant::Command::Up.new(
+  [], 
+  sandbox.construct(:ui_class => Vagrant::UI::Basic)
+).execute
+
+begin
+  sleep
+rescue Interrupt
+end
+```
 
 ## Contributing
 
