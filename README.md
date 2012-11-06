@@ -25,7 +25,7 @@ example!
 # construct a vagrant environment from the configuration and start all the
 # boxes within it. Upon exiting (via ^C), destroy the boxes and the directory.
 
-require 'vagrant'
+require 'vagrant/sandbox'
 sandbox = Vagrant::Sandbox.new
 
 sandbox.configure do |config|
