@@ -102,6 +102,15 @@ class Vagrant::Prison
   end
 
   #
+  # Configures the environment. Useful if you wish to open a prison without
+  # re-creating it.
+  #
+  def configure_environment(env_opts={})
+    @env_opts ||= env_opts.merge(:cwd => dir) 
+    @env ||= Vagrant::Environment.new(@env_opts)
+  end
+
+  #
   # Construct the sandbox. This:
   #
   # * creates your directory (if necessary)
@@ -121,10 +130,9 @@ class Vagrant::Prison
                  @initial_config
                end
 
-    File.binwrite(File.join(dir, "Vagrantfile"), to_write)
+    configure_environment(env_opts)
 
-    @env_opts = env_opts.merge(:cwd => dir) 
-    @env = Vagrant::Environment.new(@env_opts)
+    File.binwrite(File.join(dir, "Vagrantfile"), to_write)
 
     if @cleanup_on_exit
       # clean up after garbage collection or if the system exits
