@@ -50,9 +50,16 @@ class Vagrant::Prison
   #
   # Returns the configuration associated with this prison.
   #
-
   def config
     @initial_config
+  end
+
+  #
+  # Returns the options that were used to create the Vagrant::Environment if it
+  # has already been created.
+  #
+  def env_opts
+    @env_opts
   end
 
   #
@@ -115,7 +122,8 @@ class Vagrant::Prison
 
     File.binwrite(File.join(dir, "Vagrantfile"), to_write)
 
-    @env = Vagrant::Environment.new(env_opts.merge(:cwd => dir))
+    @env_opts = env_opts.merge(:cwd => dir) 
+    @env = Vagrant::Environment.new(@env_opts)
 
     if @cleanup_on_exit
       # clean up after garbage collection or if the system exits
