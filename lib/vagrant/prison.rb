@@ -48,6 +48,14 @@ class Vagrant::Prison
   end
 
   #
+  # Returns the configuration associated with this prison.
+  #
+
+  def config
+    @initial_config
+  end
+
+  #
   # Configures a Vagrantfile.
   #
   # You can do this two ways: either supply a string of Ruby to configure the
