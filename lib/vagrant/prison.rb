@@ -6,6 +6,7 @@ require 'tempfile'
 require 'erb'
 
 Vagrant::Prison::Vagrantfile = <<-EOF
+require 'vagrant/prison'
 dumped_config = <%= @config.inspect %>
 
 Vagrant::Config.run do |config|
