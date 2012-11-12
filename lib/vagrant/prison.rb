@@ -16,6 +16,8 @@ EOF
 
 class Vagrant::Prison
   attr_reader :dir
+  # name this prison. only used for your needs to refer to later.
+  attr_accessor :name
 
   #
   # Construct a new Vagrant sandbox. Takes two arguments: (the third should be
@@ -33,6 +35,7 @@ class Vagrant::Prison
     @initial_config = nil
     @env    = env
     @cleanup_on_exit = cleanup_on_exit
+    @name = "default"
   end
 
   def self.cleanup(dir, env)
@@ -44,8 +47,10 @@ class Vagrant::Prison
   # the directory will be deleted.
   #
   def cleanup
-    destroy
-    FileUtils.rm_r(dir)
+    if File.directory?(dir)
+      destroy
+      FileUtils.rm_r(dir)
+    end
   end
 
   #
@@ -155,7 +160,9 @@ class Vagrant::Prison
   # `cleanup` for a one-shot way to orchestrate that.
   #
   def destroy
+    wd = Dir.pwd
     Dir.chdir(dir)
     Vagrant::Command::Destroy.new(%w[-f], @env).execute
+    Dir.chdir(wd)
   end
 end
