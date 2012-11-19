@@ -102,6 +102,13 @@ class Vagrant::Prison
   end
 
   #
+  # Returns the Vagrant::Environment, if any.
+  #
+  def env
+    @env
+  end
+
+  #
   # Configures a Vagrantfile.
   #
   # You can do this two ways: either supply a string of Ruby to configure the
@@ -144,8 +151,8 @@ class Vagrant::Prison
   # re-creating it.
   #
   def configure_environment(env_opts={})
-    @env_opts ||= env_opts.merge(:cwd => dir) 
-    @env ||= Vagrant::Environment.new(@env_opts)
+    @env_opts.merge!(env_opts)
+    @env = Vagrant::Environment.new(@env_opts)
   end
 
   #
@@ -157,6 +164,10 @@ class Vagrant::Prison
   # * returns a Vagrant::Environment referencing these items
   # * if you set `cleanup_on_exit` in the constructor, runs `cleanup` on
   #   garbage collection of this object or program exit, which ever comes first.
+  #
+  # Note, if you supplied environment options here, they will merge into the
+  # ones supplied to the constructor, before the Vagrant::Environment was
+  # created.
   #
   def construct(env_opts={})
     FileUtils.mkdir_p(dir)
