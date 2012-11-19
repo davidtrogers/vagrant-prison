@@ -80,9 +80,10 @@ class Vagrant::Prison
   #
   def cleanup
     if File.directory?(dir)
-      destroy
-      FileUtils.rm_r(dir)
+      return destroy && FileUtils.rm_r(dir)
     end
+
+    return false
   end
 
   #
@@ -171,20 +172,44 @@ class Vagrant::Prison
 
     File.binwrite(File.join(dir, "Vagrantfile"), to_write)
 
-    if @cleanup_on_exit
-      # clean up after garbage collection or if the system exits
-      ObjectSpace.define_finalizer(self) do
-        Vagrant::Prison.cleanup(dir, env)
-      end
-
-      obj = self # look ma, closures
-
-      at_exit do
-        obj.cleanup
-      end
-    end
+    build_cleanup_hooks if @cleanup_on_exit
 
     return @env
+  end
+
+  #
+  # Create the cleanup hooks that tell ruby to torch this prison on garbage
+  # collection or exit.
+  #
+  def build_cleanup_hooks
+    raise "Environment not configured!" unless @env
+
+    env = @env
+
+    # clean up after garbage collection or if the system exits
+    ObjectSpace.define_finalizer(self) do
+      Vagrant::Prison.cleanup(dir, env)
+    end
+
+    at_exit do
+      self.cleanup
+    end
+  end
+
+  #
+  # Start or 'up' the entire prison. Convenience Method. Will also construct
+  # the environment if it is not already constructed.
+  #
+
+  def start
+    construct unless @env
+
+    Dir.chdir(dir) do
+      Vagrant::Command::Up.new([], @env).execute
+    end
+    return true
+  rescue SystemExit => e
+    return e.status == 0
   end
 
   #
@@ -192,9 +217,11 @@ class Vagrant::Prison
   # `cleanup` for a one-shot way to orchestrate that.
   #
   def destroy
-    wd = Dir.pwd
-    Dir.chdir(dir)
-    Vagrant::Command::Destroy.new(%w[-f], @env).execute
-    Dir.chdir(wd)
+    Dir.chdir(dir) do
+      Vagrant::Command::Destroy.new(%w[-f], @env).execute
+    end
+    return true
+  rescue SystemExit => e
+    return e.status == 0
   end
 end
