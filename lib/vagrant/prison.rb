@@ -19,6 +19,21 @@ class Vagrant::Prison
   # name this prison. only used for your needs to refer to later.
   attr_accessor :name
 
+  def self.cleanup(dir, env)
+    Vagrant::Prison.new(dir, false, env).cleanup
+  end
+
+  # Prisons can't be marshalled because they contain a Vagrant::Environment,
+  # which has some properties about it that Marshal rejects. This routine takes
+  # the output of Vagrant::Prison#save and rebuilds the object.
+  def self._load(str)
+    hash = Marshal.load(str)
+    prison = new(hash[:dir], hash[:cleanup_on_exit])
+    prison.name = hash[:name]
+    prison.configure_environment(hash[:env_opts])
+    return prison
+  end
+
   #
   # Construct a new Vagrant sandbox. Takes two arguments: (the third should be
   # avoided)
@@ -30,16 +45,33 @@ class Vagrant::Prison
   #   the program exits, or when this object is garbage collected, which ever
   #   comes first.
   #
-  def initialize(dir=nil, cleanup_on_exit=true, env=nil)
-    @dir    = dir ||= Dir.mktmpdir
-    @initial_config = nil
-    @env    = env
-    @cleanup_on_exit = cleanup_on_exit
-    @name = "default"
+  def initialize(dir=nil, cleanup_on_exit=true, env_opts={})
+    @dir              = dir ||= Dir.mktmpdir
+    @initial_config   = nil
+    @env_opts         = env_opts.merge(:cwd => @dir, :ui_class => Vagrant::UI::Basic)
+    @cleanup_on_exit  = cleanup_on_exit
+    @name             = "default"
   end
 
-  def self.cleanup(dir, env)
-    Vagrant::Prison.new(dir, false, env).cleanup
+  #
+  # Return a marshalled representation of a Vagrant::Prison. This actually
+  # yields a marshalled array of the directory the prison lives in, and the
+  # options used for creating the Vagrant::Environment.
+  #
+  # This routine will raise if the environment has not been configured yet.
+  #
+
+  def _dump(level)
+    unless @env_opts
+      raise "This environment has not been configured/created! Cannot be dumped."
+    end
+
+    Marshal.dump({
+      :dir              => @dir,
+      :cleanup_on_exit  => @cleanup_on_exit,
+      :env_opts         => @env_opts,
+      :name             => @name
+    })
   end
 
   #
