@@ -229,7 +229,8 @@ class Vagrant::Prison
   #
   def destroy
     Dir.chdir(dir) do
-      Vagrant::Command::Destroy.new(%w[-f], @env).execute
+      Vagrant::Command::Halt.new([], @env).execute rescue nil
+      Vagrant::Command::Destroy.new(%w[-f], @env).execute rescue nil
     end
     return true
   rescue SystemExit => e
