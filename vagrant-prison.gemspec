@@ -10,7 +10,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["erik+github@hollensbe.org"]
   gem.description   = %q{A programmatic way to configure and sandbox Vagrant}
   gem.summary       = %q{A programmatic way to configure and sandbox Vagrant}
-  gem.homepage      = "https://github.com/hoteltonight/vagrant-prison"
+  gem.homepage      = "https://github.com/chef-workflow/vagrant-prison"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
