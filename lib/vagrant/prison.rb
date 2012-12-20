@@ -228,8 +228,15 @@ class Vagrant::Prison
   # `cleanup` for a one-shot way to orchestrate that.
   #
   def destroy
+    require 'timeout'
     Dir.chdir(dir) do
-      Vagrant::Command::Halt.new([], @env).execute rescue nil
+      begin
+        Timeout.timeout(60) do
+          Vagrant::Command::Halt.new([], @env).execute rescue nil
+        end
+      rescue Timeout::Error
+        $stderr.puts "Timeout reached; forcing destroy"
+      end
       Vagrant::Command::Destroy.new(%w[-f], @env).execute rescue nil
     end
     return true
